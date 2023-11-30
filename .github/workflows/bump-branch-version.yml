@@ -26,12 +26,12 @@ jobs:
           git config user.email github-actions@github.com
 
       - name: Detect type | Get Branch Name
-        if: github.event.inputs == 'auto'
+        if: github.event.inputs.version_type == 'auto'
         shell: bash
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         id: extract_branch
       - name: Detect type | Determine type
-        if: github.event.inputs == 'auto'
+        if: github.event.inputs.version_type == 'auto'
         shell: bash
         run: echo "type=${{ contains( steps.extract_branch.outputs.branch, 'feat/' ) && 'minor' || 'patch' }}" >> $GITHUB_OUTPUT
         id: def_type
