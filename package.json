@@ -1,0 +1,8 @@
+{
+  "name": "test-git",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/helloint/test-git",
+  "author": "Wayne Mao <helloint@qq.com>",
+  "license": "MIT"
+}
