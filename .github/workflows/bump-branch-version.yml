@@ -26,18 +26,18 @@ jobs:
           git config user.email github-actions@github.com
 
       - name: Detect type | Get Branch Name
-        if: github.event.inputs == 'auto'
+        if: github.event.inputs.version_type == 'auto'
         shell: bash
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         id: extract_branch
       - name: Detect type | Determine type
-        if: github.event.inputs == 'auto'
+        if: github.event.inputs.version_type == 'auto'
         shell: bash
         run: echo "type=${{ contains( steps.extract_branch.outputs.branch, 'feat/' ) && 'minor' || 'patch' }}" >> $GITHUB_OUTPUT
         id: def_type
 
       - run: |
-          yarn version --${{ steps.def_type.outputs.def_type || github.event.inputs.version_type }} --no-git-tag-version
+          yarn version --${{ steps.def_type.outputs.type || github.event.inputs.version_type }} --no-git-tag-version
       - name: get-npm-version
         id: package-version
         uses: martinbeentjes/npm-get-version-action@v1.3.1
