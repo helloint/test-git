@@ -6,7 +6,7 @@ on:
         type: choice
         description: Version Type
         options:
-          #                    - auto
+          - auto
           - minor
           - patch
 
