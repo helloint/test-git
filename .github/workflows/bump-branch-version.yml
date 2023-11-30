@@ -43,8 +43,8 @@ jobs:
         uses: martinbeentjes/npm-get-version-action@v1.3.1
         with:
           path: .
-          git commit -m 'chore: bump version ${{ steps.package-version.outputs.current-version}}'
       - run: |
+          git commit -m 'chore: bump version ${{ steps.package-version.outputs.current-version}}'
           git push
 
 env:
