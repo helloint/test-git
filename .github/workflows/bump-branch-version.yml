@@ -37,7 +37,7 @@ jobs:
         id: def_type
 
       - run: |
-          yarn version --${{ steps.def_type.outputs.def_type || github.event.inputs.version_type }} --no-git-tag-version
+          yarn version --${{ steps.def_type.outputs.type || github.event.inputs.version_type }} --no-git-tag-version
       - name: get-npm-version
         id: package-version
         uses: martinbeentjes/npm-get-version-action@v1.3.1
