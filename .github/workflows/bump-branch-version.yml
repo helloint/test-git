@@ -6,7 +6,7 @@ on:
         type: choice
         description: Version Type
         options:
-          #                    - auto
+          - auto
           - minor
           - patch
 
@@ -37,14 +37,15 @@ jobs:
         id: def_type
 
       - run: |
-          yarn version --${{ steps.def_type.outputs.def_type || github.event.inputs.version }} --no-git-tag-version
+          yarn version --${{ steps.def_type.outputs.def_type || github.event.inputs.version_type }} --no-git-tag-version
       - name: get-npm-version
         id: package-version
         uses: martinbeentjes/npm-get-version-action@v1.3.1
         with:
           path: .
-          git commit -m 'chore: bump version ${{ steps.package-version.outputs.current-version}}'
       - run: |
+          git add .
+          git commit -m 'chore: bump version ${{ steps.package-version.outputs.current-version}}'
           git push
 
 env:
