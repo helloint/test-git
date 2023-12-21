@@ -9,6 +9,10 @@ on:
                     - auto
                     - minor
                     - patch
+            ref:
+                description: Target branch
+                type: string
+                default: master
 
 jobs:
     get-level:
@@ -19,22 +23,26 @@ jobs:
         steps:
             - name: Detect type | Get Branch Name
               id: extract_branch
-              if: github.event.inputs.version_type == 'auto'
+              if: inputs.level == 'auto'
               shell: bash
               run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
 
             - name: Detect type | Determine type
-              id: get-level
-              if: github.event.inputs.version_type == 'auto'
+              id: detect-level
+              if: inputs.level == 'auto'
               shell: bash
-              run: echo "level=${{ contains( steps.extract_branch.outputs.branch, 'feat/' ) && 'minor' || 'patch' }}" >> $GITHUB_OUTPUT
+              run: echo "level=${{ contains( steps.extract_branch.outputs.branch, 'feat/' ) && 'minor' || contains( steps.extract_branch.outputs.branch, 'fix/' ) && 'patch' || '' }}" >> $GITHUB_OUTPUT
+
+            - name: Get level
+              id: get-level
+              run: echo "level=${{ steps.detect-level.outputs.level || inputs.level }}" >> $GITHUB_OUTPUT
 
     get-bumped-version:
         name: Get bumped version
         needs: [get-level]
         uses: ./.github/workflows/bump-version.yml
         with:
-            repository: ${{ inputs.repository }}
+            repository: ${{ github.repository }}
             ref: ${{ inputs.ref }}
             level: ${{ needs.get-level.outputs.level }}
 
@@ -67,7 +75,7 @@ jobs:
                       fs.readFile('./package.json', (err, data) => {
                           if (err) throw err;
                           
-                          const packageJsonObj = JSON.parse(data);
+                          let packageJsonObj = JSON.parse(data);
                           packageJsonObj.version = process.env.NEW_VERSION;
                           packageJsonObj = JSON.stringify(packageJsonObj);
                           
