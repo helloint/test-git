@@ -70,12 +70,12 @@ jobs:
               with:
                   script: |
                       const fs = require('fs');
-                      
+                    
                       fs.readFile('./package.json', (err, data) => {
                           if (err) throw err;
                           
                           let packageJsonObj = JSON.parse(data);
-                          packageJsonObj.version = `${ process.env.NEW_VERSION }`;
+                          packageJsonObj.version = `${ process.env.NEW_VERSION }`.split('"')[1];
                           packageJsonObj = JSON.stringify(packageJsonObj);
                           
                           fs.writeFile('./package.json', packageJsonObj, (err) => {
