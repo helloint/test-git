@@ -20,7 +20,7 @@ jobs:
             version: ${{ steps.read-package-version.outputs.version }}
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
               with:
                   repository: ${{ inputs.repository }}
                   ref: ${{ inputs.ref }}
@@ -29,4 +29,4 @@ jobs:
               id: read-package-version
               run: |
                   PACKAGE_VERSION=$(node -p "require('./package.json').version")
-                  echo "::set-output name=version::$PACKAGE_VERSION"
+                  run: echo "version=${ PACKAGE_VERSION }" >> $GITHUB_OUTPUT

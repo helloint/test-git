@@ -46,3 +46,6 @@ jobs:
                       const semver = require('semver');
 
                       return semver.inc(process.env.CURRENT_VERSION, process.env.LEVEL);
+
+            - run: |
+                  echo "version: ${{ steps.bump-version.outputs.result }}"
