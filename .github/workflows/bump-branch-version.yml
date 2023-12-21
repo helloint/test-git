@@ -42,7 +42,7 @@ jobs:
         needs: [get-level]
         uses: ./.github/workflows/bump-version.yml
         with:
-            repository: ${{ inputs.repository }}
+            repository: ${{ github.repository }}
             ref: ${{ inputs.ref }}
             level: ${{ needs.get-level.outputs.level }}
 
@@ -89,6 +89,7 @@ jobs:
                     git add .
                     git commit -m 'chore: bump version ${{ needs.get-bumped-version.outputs.version}}'
                     git push
+
 
 env:
     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

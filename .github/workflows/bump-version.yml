@@ -45,7 +45,7 @@ jobs:
                   script: |
                       const semver = require('semver');
 
-                      return semver.inc(process.env.NEW_PACKAGE_VERSION, process.env.LEVEL);
+                      return semver.inc(process.env.CURRENT_VERSION, process.env.LEVEL);
 
             - name: Exit with result
               run: exit ${{steps.bump-version.outputs.result}}
