@@ -12,7 +12,7 @@ on:
             ref:
                 description: Target branch
                 type: string
-                default: main
+                default: master
 
 jobs:
     get-level:
