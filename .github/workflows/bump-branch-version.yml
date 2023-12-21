@@ -76,7 +76,7 @@ jobs:
                           
                           let packageJsonObj = JSON.parse(data);
                           packageJsonObj.version = `${ process.env.NEW_VERSION }`.split('"')[1];
-                          packageJsonObj = JSON.stringify(packageJsonObj, null, 2););
+                          packageJsonObj = JSON.stringify(packageJsonObj, null, 2);
                           
                           fs.writeFile('./package.json', packageJsonObj, (err) => {
                               if (err) throw err;
