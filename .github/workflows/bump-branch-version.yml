@@ -19,15 +19,19 @@ jobs:
         steps:
             - name: Detect type | Get Branch Name
               id: extract_branch
-              if: github.event.inputs.version_type == 'auto'
+              if: inputs.version_type == 'auto'
               shell: bash
               run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
 
             - name: Detect type | Determine type
-              id: get-level
-              if: github.event.inputs.version_type == 'auto'
+              id: detect-level
+              if: inputs.version_type == 'auto'
               shell: bash
               run: echo "level=${{ contains( steps.extract_branch.outputs.branch, 'feat/' ) && 'minor' || 'patch' }}" >> $GITHUB_OUTPUT
+
+            - name: Get level
+              id: get-level
+              run: echo "level=${{ steps.detect-level.outputs.level || inputs.level }}" >> $GITHUB_OUTPUT
 
     get-bumped-version:
         name: Get bumped version
