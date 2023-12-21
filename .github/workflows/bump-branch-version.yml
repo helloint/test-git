@@ -9,6 +9,10 @@ on:
                     - auto
                     - minor
                     - patch
+            ref:
+                description: target branch
+                type: string
+                default: main
 
 jobs:
     get-level:
@@ -27,7 +31,7 @@ jobs:
               id: detect-level
               if: inputs.level == 'auto'
               shell: bash
-              run: echo "level=${{ contains( steps.extract_branch.outputs.branch, 'feat/' ) && 'minor' || 'patch' }}" >> $GITHUB_OUTPUT
+              run: echo "level=${{ contains( steps.extract_branch.outputs.branch, 'feat/' ) && 'minor' || ${{ contains( steps.extract_branch.outputs.branch, 'fix/' ) && 'patch' ||'' }}" >> $GITHUB_OUTPUT
 
             - name: Get level
               id: get-level
