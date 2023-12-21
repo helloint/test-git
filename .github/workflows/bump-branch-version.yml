@@ -19,13 +19,13 @@ jobs:
         steps:
             - name: Detect type | Get Branch Name
               id: extract_branch
-              if: inputs.version_type == 'auto'
+              if: inputs.level == 'auto'
               shell: bash
               run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
 
             - name: Detect type | Determine type
               id: detect-level
-              if: inputs.version_type == 'auto'
+              if: inputs.level == 'auto'
               shell: bash
               run: echo "level=${{ contains( steps.extract_branch.outputs.branch, 'feat/' ) && 'minor' || 'patch' }}" >> $GITHUB_OUTPUT
 
