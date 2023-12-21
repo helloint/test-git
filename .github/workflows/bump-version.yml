@@ -1,0 +1,51 @@
+on:
+    workflow_call:
+        inputs:
+            repository:
+                required: true
+                type: string
+            ref:
+                required: true
+                type: string
+            level:
+                required: true
+                type: string
+        outputs:
+            version:
+                description: The version bumped
+                value: ${{ jobs.bump-current-version.outputs.version }}
+
+jobs:
+    read-current-version:
+        name: Read current version
+        uses: ./.github/workflows/read-version.yml
+        with:
+            repository: ${{ inputs.repository }}
+            ref: ${{ inputs.ref }}
+
+    bump-current-version:
+        name: Output bumped version
+        runs-on: ubuntu-latest
+        needs: [read-current-version]
+        outputs:
+            version: ${{ steps.bump-current-version.outputs.version }}
+        steps:
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+
+            - run: yarn add semver
+
+            - uses: actions/github-script@v6
+              id: bump-version
+              env:
+                  CURRENT_VERSION: ${{ needs.read-current-version.outputs.version }}
+                  LEVEL: ${{ inputs.level }}
+              with:
+                  script: |
+                      const semver = require('semver');
+
+                      return semver.inc(process.env.NEW_PACKAGE_VERSION, process.env.LEVEL);
+
+            - name: Exit with result
+              run: exit ${{steps.bump-version.outputs.result}}

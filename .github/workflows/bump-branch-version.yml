@@ -1,52 +1,86 @@
 name: Bump Branch Version
 on:
-  workflow_dispatch:
-    inputs:
-      version_type:
-        type: choice
-        description: Version Type
-        options:
-          - auto
-          - minor
-          - patch
+    workflow_dispatch:
+        inputs:
+            level:
+                description: Level can be minor, patch
+                type: choice
+                options:
+                    - auto
+                    - minor
+                    - patch
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Use Node.js 18.7
-        uses: actions/setup-node@v1
-        with:
-          version: 18.7
-          registry-url: 'https://registry.npmjs.org'
-      - run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+    get-level:
+        name: Get release level
+        runs-on: ubuntu-latest
+        outputs:
+            level: ${{ steps.get-level.outputs.level }}
+        steps:
+            - name: Detect type | Get Branch Name
+              id: extract_branch
+              if: github.event.inputs.version_type == 'auto'
+              shell: bash
+              run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
 
-      - name: Detect type | Get Branch Name
-        if: github.event.inputs.version_type == 'auto'
-        shell: bash
-        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
-        id: extract_branch
-      - name: Detect type | Determine type
-        if: github.event.inputs.version_type == 'auto'
-        shell: bash
-        run: echo "type=${{ contains( steps.extract_branch.outputs.branch, 'feat/' ) && 'minor' || 'patch' }}" >> $GITHUB_OUTPUT
-        id: def_type
+            - name: Detect type | Determine type
+              id: get-level
+              if: github.event.inputs.version_type == 'auto'
+              shell: bash
+              run: echo "level=${{ contains( steps.extract_branch.outputs.branch, 'feat/' ) && 'minor' || 'patch' }}" >> $GITHUB_OUTPUT
 
-      - run: |
-          yarn version --${{ steps.def_type.outputs.type || github.event.inputs.version_type }} --no-git-tag-version
-      - name: get-npm-version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@v1.3.1
+    get-bumped-version:
+        name: Get bumped version
+        needs: [get-level]
+        uses: ./.github/workflows/bump-version.yml
         with:
-          path: .
-      - run: |
-          git add .
-          git commit -m 'chore: bump version ${{ steps.package-version.outputs.current-version}}'
-          git push
+            repository: ${{ inputs.repository }}
+            ref: ${{ inputs.ref }}
+            level: ${{ needs.get-level.outputs.level }}
+
+    update-version:
+        name: Update version
+        runs-on: ubuntu-latest
+        needs: [get-bumped-version]
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v1
+              with:
+                  version: 18.7
+                  registry-url: 'https://registry.npmjs.org'
+
+            - run: |
+                  git config user.name github-actions
+                  git config user.email github-actions@github.com
+
+            - uses: actions/github-script@v6
+              id: bump-version
+              env:
+                  NEW_VERSION: ${{ needs.get-bumped-version.outputs.version }}
+              with:
+                  script: |
+                      const fs = require('fs');
+                      
+                      fs.readFile('./package.json', (err, data) => {
+                          if (err) throw err;
+                          
+                          const packageJsonObj = JSON.parse(data);
+                          packageJsonObj.version = process.env.NEW_VERSION;
+                          packageJsonObj = JSON.stringify(packageJsonObj);
+                          
+                          fs.writeFile('./package.json', packageJsonObj, (err) => {
+                              if (err) throw err;
+                              console.log('The file has been saved!');
+                          });
+                      });
+
+            - run: |
+                    git add .
+                    git commit -m 'chore: bump version ${{ needs.get-bumped-version.outputs.version}}'
+                    git push
 
 env:
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
