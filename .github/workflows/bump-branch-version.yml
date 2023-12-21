@@ -75,7 +75,7 @@ jobs:
                       fs.readFile('./package.json', (err, data) => {
                           if (err) throw err;
                           
-                          const packageJsonObj = JSON.parse(data);
+                          let packageJsonObj = JSON.parse(data);
                           packageJsonObj.version = process.env.NEW_VERSION;
                           packageJsonObj = JSON.stringify(packageJsonObj);
                           
@@ -89,7 +89,6 @@ jobs:
                     git add .
                     git commit -m 'chore: bump version ${{ needs.get-bumped-version.outputs.version}}'
                     git push
-
 
 env:
     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
