@@ -70,14 +70,14 @@ jobs:
               with:
                   script: |
                       const fs = require('fs');
-                    
+                      
                       fs.readFile('./package.json', (err, data) => {
                           if (err) throw err;
-                          
+                  
                           let packageJsonObj = JSON.parse(data);
-                          packageJsonObj.version = `${ process.env.NEW_VERSION }`.split('"')[1];
+                          packageJsonObj.version = `${ process.env.NEW_VERSION }`;
                           packageJsonObj = JSON.stringify(packageJsonObj, null, 2);
-                          
+                  
                           fs.writeFile('./package.json', packageJsonObj, (err) => {
                               if (err) throw err;
                               console.log('The file has been saved!');
@@ -85,9 +85,9 @@ jobs:
                       });
 
             - run: |
-                    git add .
-                    git commit -m 'chore: bump version ${{ needs.get-bumped-version.outputs.version}}'
-                    git push
+                  git add .
+                  git commit -m 'chore: bump version ${{ needs.get-bumped-version.outputs.version }}'
+                  git push
 
 env:
     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

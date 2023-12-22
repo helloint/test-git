@@ -1,3 +1,4 @@
+name: Bump Version
 on:
     workflow_call:
         inputs:
@@ -42,9 +43,9 @@ jobs:
                   CURRENT_VERSION: ${{ needs.read-current-version.outputs.version }}
                   LEVEL: ${{ inputs.level }}
               with:
+                  result-encoding: string
                   script: |
                       const semver = require('semver');
-
                       return semver.inc(process.env.CURRENT_VERSION, process.env.LEVEL);
 
             - run: |
