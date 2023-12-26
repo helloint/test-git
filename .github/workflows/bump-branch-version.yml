@@ -70,7 +70,8 @@ jobs:
               with:
                   script: |
                       const fs = require('fs');
-                      
+                      const os = require('os');
+                    
                       fs.readFile('./package.json', (err, data) => {
                           if (err) throw err;
                   
@@ -78,7 +79,7 @@ jobs:
                           packageJsonObj.version = `${ process.env.NEW_VERSION }`;
                           packageJsonObj = JSON.stringify(packageJsonObj, null, 2);
                   
-                          fs.writeFile('./package.json', packageJsonObj, (err) => {
+                          fs.writeFile('./package.json', packageJsonObj + os.EOL, (err) => {
                               if (err) throw err;
                               console.log('The file has been saved!');
                           });
