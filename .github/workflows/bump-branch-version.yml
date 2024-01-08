@@ -3,7 +3,7 @@ on:
     workflow_dispatch:
         inputs:
             level:
-                description: Level can be major/minor/patch. 'auto' only support minor/patch, depends on the prefix of branch name
+                description: major/minor/patch. 'auto' only detect minor/patch
                 type: choice
                 options:
                     - auto
@@ -51,10 +51,11 @@ jobs:
             - name: Determine bump type
               id: bump_type
               if: github.event.inputs.version_type == 'auto'
+              env:
+                  auto_type: ${{ contains( steps.extract_branch.outputs.branch, 'feat/' ) && 'minor' || 'patch' }}
               shell: bash
               run: |
-                  echo "auto_type=${{ contains( steps.extract_branch.outputs.branch, 'feat/' ) && 'minor' || 'patch' }}"
-                  echo "type=${{ auto_type || github.event.inputs.version_type }}" >> $GITHUB_OUTPUT
+                  echo "type=${{ env.auto_type || github.event.inputs.version_type }}" >> $GITHUB_OUTPUT
 
             - name: Bump version
               run: |
