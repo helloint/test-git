@@ -21,11 +21,13 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0
 
             - name: Setup Node.js
               uses: actions/setup-node@v3
               with:
-                node-version: 18
+                  node-version: 18
 
             - name: Setup Git
               run: |
@@ -35,10 +37,10 @@ jobs:
             - name: Git auto merge
               # Reference: https://stackoverflow.com/a/8641053/8175165
               run: |
-                  git merge --no-commit --no-ff master
+                  git merge --no-commit --no-ff origin/${{ github.event.inputs.ref}}
                   : # action will abort if conflict error occurs here
                   git merge --abort
-                  git merge master --no-edit
+                  git merge origin/${{ github.event.inputs.ref}} --no-edit
                   : # If no changes, then nothing will be committed
 
             - name: Extract branch name
