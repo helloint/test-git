@@ -37,15 +37,17 @@ jobs:
             - name: Git auto merge
               # Reference: https://stackoverflow.com/a/8641053/8175165
               run: |
-                  git merge --no-commit --no-ff origin/${{ github.event.inputs.ref}}
-                  : # action will abort if conflict error occurs here
+                  git checkout ${{ github.event.inputs.ref}}
+                  git checkout ${{ github.head_ref || github.ref_name }}
+                  # action will abort if conflict error occurs here
+                  git merge --no-commit --no-ff ${{ github.event.inputs.ref}}
 
             - name: Git commit change if being merged
               continue-on-error: true
               run: |
                   git merge --abort
-                  git merge origin/${{ github.event.inputs.ref}} --no-edit
                   : # If no changes, then nothing will be committed
+                  git merge ${{ github.event.inputs.ref}} --no-edit
 
             - name: Extract branch name
               # Reference: https://stackoverflow.com/a/58035262/8175165
