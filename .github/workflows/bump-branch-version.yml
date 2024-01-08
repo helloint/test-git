@@ -50,18 +50,18 @@ jobs:
             - name: Extract branch name
               # Reference: https://stackoverflow.com/a/58035262/8175165
               id: extract_branch
-              if: github.event.inputs.version_type == 'auto'
+              if: github.event.inputs.level == 'auto'
               shell: bash
               run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
 
             - name: Determine bump type
               id: bump_type
-              if: github.event.inputs.version_type == 'auto'
+              if: github.event.inputs.level == 'auto'
               env:
                   auto_type: ${{ contains( steps.extract_branch.outputs.branch, 'feat/' ) && 'minor' || 'patch' }}
               shell: bash
               run: |
-                  echo "type=${{ env.auto_type || github.event.inputs.version_type }}" >> $GITHUB_OUTPUT
+                  echo "type=${{ env.auto_type || github.event.inputs.level }}" >> $GITHUB_OUTPUT
 
             - name: Bump version
               run: |
