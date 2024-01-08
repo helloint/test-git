@@ -53,7 +53,7 @@ jobs:
               if: github.event.inputs.version_type == 'auto'
               shell: bash
               run: |
-                  auto_type = ${{ contains( steps.extract_branch.outputs.branch, 'feat/' ) && 'minor' || 'patch' }}
+                  echo "auto_type=${{ contains( steps.extract_branch.outputs.branch, 'feat/' ) && 'minor' || 'patch' }}"
                   echo "type=${{ auto_type || github.event.inputs.version_type }}" >> $GITHUB_OUTPUT
 
             - name: Bump version
