@@ -39,6 +39,10 @@ jobs:
               run: |
                   git merge --no-commit --no-ff origin/${{ github.event.inputs.ref}}
                   : # action will abort if conflict error occurs here
+
+            - name: Git commit change if being merged
+              continue-on-error: true
+              run: |
                   git merge --abort
                   git merge origin/${{ github.event.inputs.ref}} --no-edit
                   : # If no changes, then nothing will be committed
