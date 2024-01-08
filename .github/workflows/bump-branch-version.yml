@@ -37,33 +37,33 @@ jobs:
             - name: Git auto merge
               # Reference: https://stackoverflow.com/a/8641053/8175165
               run: |
-                  git checkout ${{ github.event.inputs.ref}}
+                  git checkout ${{ inputs.ref}}
                   git checkout ${{ github.head_ref || github.ref_name }}
-                  # action will abort if conflict error occurs here
-                  git merge --no-commit --no-ff ${{ github.event.inputs.ref}}
+                  : # action will abort if conflict error occurs here
+                  git merge --no-commit --no-ff ${{ inputs.ref}}
 
             - name: Git commit change if being merged
               continue-on-error: true
               run: |
                   git merge --abort
                   : # If no changes, then nothing will be committed
-                  git merge ${{ github.event.inputs.ref}} --no-edit
+                  git merge ${{ inputs.ref}} --no-edit
 
             - name: Extract branch name
               # Reference: https://stackoverflow.com/a/58035262/8175165
               id: extract_branch
-              if: github.event.inputs.level == 'auto'
+              if: inputs.level == 'auto'
               shell: bash
               run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
 
             - name: Determine bump type
               id: bump_type
-              if: github.event.inputs.level == 'auto'
+              if: inputs.level == 'auto'
               env:
                   auto_type: ${{ contains( steps.extract_branch.outputs.branch, 'feat/' ) && 'minor' || 'patch' }}
               shell: bash
               run: |
-                  echo "type=${{ env.auto_type || github.event.inputs.level }}" >> $GITHUB_OUTPUT
+                  echo "type=${{ env.auto_type || inputs.level }}" >> $GITHUB_OUTPUT
 
             - name: Bump version
               run: |
