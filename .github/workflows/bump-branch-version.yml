@@ -71,10 +71,11 @@ jobs:
 
             - name: Get bumped version
               id: package-version
-              uses: martinbeentjes/npm-get-version-action@v1.3.1
+              run: |
+                  echo "version=$(cat package.json | jq -r '.version')" >> $GITHUB_OUTPUT
 
             - name: Push code
               run: |
                   git add .
-                  git commit -m 'chore: bump version ${{ steps.package-version.outputs.current-version}}'
+                  git commit -m 'chore: bump version ${{ steps.package-version.outputs.version}}'
                   git push
