@@ -1,6 +1,6 @@
 {
   "name": "test-git",
-  "version": "1.9.1",
+  "version": "1.9.3",
   "main": "index.js",
   "repository": "https://github.com/helloint/test-git",
   "author": "Wayne Mao <helloint@qq.com>",
