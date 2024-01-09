@@ -3,8 +3,7 @@ on:
     workflow_dispatch:
         inputs:
             level:
-                description: 'Level, can be major/minor/patch.
-                `auto` only detect minor/patch'
+                description: major/minor/patch. 'auto' only detect minor/patch
                 type: choice
                 options:
                     - auto
