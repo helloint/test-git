@@ -3,11 +3,11 @@ on:
     workflow_dispatch:
         inputs:
             level:
-                description: major/minor/patch. 'auto' only detect minor/patch
+                description: Level can be minor, patch
                 type: choice
+                default: auto
                 options:
                     - auto
-                    - major
                     - minor
                     - patch
             ref:
